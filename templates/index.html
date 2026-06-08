@@ -6,7 +6,7 @@
   <title>Games Scraper – Upcoming AAA Games</title>
   <style>
     /* ══════════════════════════════════════════
-       CSS VARIABLES — dark / light
+       CSS VARIABLES — dark / light / neon
     ══════════════════════════════════════════ */
     :root {
       --bg:       #0d0f14;
@@ -22,6 +22,9 @@
       --shadow:   rgba(0,0,0,.55);
       --radius:   12px;
       --header-h: 68px;
+      --glow:     none;
+      --glow-card: none;
+      --glow-btn:  none;
     }
     [data-theme="light"] {
       --bg:       #f0f2f8;
@@ -35,6 +38,142 @@
       --muted:    #7a8099;
       --border:   #dde1ee;
       --shadow:   rgba(0,0,0,.12);
+      --glow:     none;
+      --glow-card: none;
+      --glow-btn:  none;
+    }
+    [data-theme="neon"] {
+      --bg:       #05070f;
+      --surface:  #080d1a;
+      --card:     #0b1020;
+      --card2:    #0e1428;
+      --accent:   #00ffe5;
+      --accent2:  #bf00ff;
+      --text:     #e0faff;
+      --text2:    #a0d8ef;
+      --muted:    #4a6080;
+      --border:   #0d2040;
+      --shadow:   rgba(0,255,229,.08);
+      --glow:     0 0 12px rgba(0,255,229,.55), 0 0 32px rgba(0,255,229,.18);
+      --glow-card: 0 0 0 1px rgba(0,255,229,.25), 0 8px 32px rgba(0,255,229,.12);
+      --glow-btn:  0 0 14px rgba(0,255,229,.8), 0 0 32px rgba(0,255,229,.4);
+    }
+
+    /* ── Neon-specific overrides ── */
+    [data-theme="neon"] body {
+      background-image:
+        radial-gradient(ellipse 80% 40% at 20% 0%, rgba(0,255,229,.05) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 30% at 80% 100%, rgba(191,0,255,.05) 0%, transparent 60%);
+    }
+    [data-theme="neon"] header {
+      background: rgba(5,7,15,.92);
+      border-bottom-color: rgba(0,255,229,.2);
+      box-shadow: 0 1px 0 rgba(0,255,229,.15), 0 4px 24px rgba(0,255,229,.06);
+    }
+    [data-theme="neon"] .logo {
+      text-shadow: 0 0 18px rgba(0,255,229,.6);
+    }
+    [data-theme="neon"] .logo .gs {
+      color: var(--accent);
+      text-shadow: var(--glow);
+    }
+    [data-theme="neon"] .filter-bar {
+      background: rgba(8,13,26,.95);
+      border-bottom-color: rgba(0,255,229,.15);
+    }
+    [data-theme="neon"] .fpill.active {
+      background: transparent;
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: var(--glow), inset 0 0 12px rgba(0,255,229,.08);
+    }
+    [data-theme="neon"] .fpill:hover {
+      border-color: rgba(0,255,229,.5);
+      color: var(--accent);
+    }
+    [data-theme="neon"] .view-tab.active {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      box-shadow: var(--glow);
+    }
+    [data-theme="neon"] .card {
+      border-color: rgba(0,255,229,.12);
+    }
+    [data-theme="neon"] .card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--glow-card);
+      transform: translateY(-5px);
+    }
+    [data-theme="neon"] .card-title {
+      color: var(--text);
+    }
+    [data-theme="neon"] .card:hover .card-title {
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(0,255,229,.4);
+    }
+    [data-theme="neon"] .play-btn {
+      background: transparent;
+      border: 2px solid var(--accent);
+      box-shadow: var(--glow-btn);
+    }
+    [data-theme="neon"] .rel-date {
+      color: var(--accent2);
+    }
+    [data-theme="neon"] .rank-badge {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    [data-theme="neon"] .tag {
+      border-color: rgba(0,255,229,.2);
+      color: rgba(0,255,229,.6);
+      background: rgba(0,255,229,.04);
+    }
+    [data-theme="neon"] .search-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,255,229,.15);
+    }
+    [data-theme="neon"] .search-btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    [data-theme="neon"] .search-btn:hover {
+      background: rgba(0,255,229,.1);
+    }
+    [data-theme="neon"] .theme-btn {
+      border-color: rgba(191,0,255,.4);
+      box-shadow: 0 0 10px rgba(191,0,255,.3);
+    }
+    [data-theme="neon"] .theme-btn:hover {
+      border-color: var(--accent2);
+      box-shadow: 0 0 18px rgba(191,0,255,.6);
+    }
+    [data-theme="neon"] .section-hdr h2 em {
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(0,255,229,.5);
+    }
+    [data-theme="neon"] .section-line {
+      background: linear-gradient(90deg, rgba(0,255,229,.4), transparent);
+    }
+    [data-theme="neon"] .modal-box {
+      border-color: var(--accent);
+      box-shadow: var(--glow-card), 0 30px 80px rgba(0,0,0,.9);
+    }
+    [data-theme="neon"] footer a {
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(0,255,229,.4);
+    }
+    [data-theme="neon"] .back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    [data-theme="neon"] .count-badge b {
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(0,255,229,.5);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -402,7 +541,7 @@
            href="/?view=awaited">🔥 Top Awaited</a>
       </div>
 
-      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme"></button>
 
       <span class="count-badge"><b>{{ games|length }}</b> games</span>
     </div>
@@ -552,18 +691,28 @@
 
 <script>
 /* ── Theme ─────────────────────────────────────────── */
+const THEMES  = ['dark', 'light', 'neon'];
+const ICONS   = { dark: '🌙', light: '☀️', neon: '⚡' };
+const LABELS  = { dark: 'Dark', light: 'Light', neon: 'Neon' };
+
 (function(){
   const saved = localStorage.getItem('gs_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('themeBtn').textContent = saved === 'dark' ? '🌙' : '☀️';
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = ICONS[saved] || '🌙';
+  btn.title = `Theme: ${LABELS[saved]} — click to switch`;
 })();
 
 function toggleTheme(){
-  const html = document.documentElement;
-  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  const html    = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const idx     = THEMES.indexOf(current);
+  const next    = THEMES[(idx + 1) % THEMES.length];
   html.setAttribute('data-theme', next);
   localStorage.setItem('gs_theme', next);
-  document.getElementById('themeBtn').textContent = next === 'dark' ? '🌙' : '☀️';
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = ICONS[next];
+  btn.title = `Theme: ${LABELS[next]} — click to switch`;
 }
 
 /* ── Trailer modal ──────────────────────────────────── */
