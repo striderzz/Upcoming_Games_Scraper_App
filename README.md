@@ -23,7 +23,8 @@ A Flask web application that fetches and displays the **Top 30 upcoming AAA game
 
 | Top Awaited | Upcoming by Genre |
 |---|---|
-| ![Top Awaited](screenshots/preview.png) | Filter any genre from the nav bar |
+| ![Top Awaited](<img width="2560" height="1331" alt="Screenshot (671)" src="https://github.com/user-attachments/assets/b5708538-98b9-488c-b52f-257189a212e8" />
+) | Filter any genre from the nav bar |
 
 ---
 
