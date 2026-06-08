@@ -10,7 +10,7 @@ A Flask web application that fetches and displays the **Top 30 upcoming AAA game
 
 - **Top 30 Upcoming Games** — sorted by nearest release date, strictly unreleased titles only
 - **Top 30 Most Awaited** — sorted by the number of users who wishlisted the game on RAWG
-- **18 Genre and Tag Filters** — Action, Adventure, RPG, Shooter, Fighting, Strategy, Simulation, Sports, Racing, Puzzle, Platformer, Horror, Survival Horror, Open World, Stealth, Souls-like, Battle Royale
+- **17 Genre and Tag Filters** — Action, Adventure, RPG, Shooter, Fighting, Strategy, Simulation, Sports, Racing, Puzzle, Platformer, Horror, Survival Horror, Open World, Stealth, Souls-like, Battle Royale
 - **In-App Trailer Player** — scrapes YouTube search results for a real video ID and plays it inside a modal overlay
 - **Search with Similar Recommendations** — search upcoming games by name and instantly see related upcoming titles
 - **Dark and Light Theme** — one-click toggle, preference stored in localStorage
