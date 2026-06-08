@@ -2,7 +2,8 @@
 
 A Flask web application that fetches and displays the **Top 30 upcoming AAA games** using the [RAWG Video Games Database API](https://rawg.io/apidocs). Each game card shows a poster, release date, genre tags, platform list, Metacritic score, and an in-app trailer player backed by YouTube.
 
-![Preview](screenshots/preview.png)
+<img width="2560" height="1331" alt="Screenshot (671)" src="https://github.com/user-attachments/assets/f8eddea9-9156-4a7e-ac35-3cbdf0639490" />
+
 
 ---
 
