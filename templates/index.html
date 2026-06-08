@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Games Scraper – Upcoming AAA Games</title>
+  <style>
+    /* ══════════════════════════════════════════
+       CSS VARIABLES — dark / light
+    ══════════════════════════════════════════ */
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161a24;
+      --card:     #1c2130;
+      --card2:    #20263a;
+      --accent:   #e63946;
+      --accent2:  #457b9d;
+      --text:     #e8eaf0;
+      --text2:    #b0b8d0;
+      --muted:    #7a8099;
+      --border:   #252b3b;
+      --shadow:   rgba(0,0,0,.55);
+      --radius:   12px;
+      --header-h: 68px;
+    }
+    [data-theme="light"] {
+      --bg:       #f0f2f8;
+      --surface:  #ffffff;
+      --card:     #ffffff;
+      --card2:    #f7f8fc;
+      --accent:   #d62839;
+      --accent2:  #2a6496;
+      --text:     #1a1d2e;
+      --text2:    #3a3f55;
+      --muted:    #7a8099;
+      --border:   #dde1ee;
+      --shadow:   rgba(0,0,0,.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      transition: background .25s, color .25s;
+    }
+
+    /* ══════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════ */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 16px var(--shadow);
+      transition: background .25s, border-color .25s;
+    }
+    .header-inner {
+      max-width: 1440px; margin: 0 auto;
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 24px; flex-wrap: wrap;
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 1.45rem; font-weight: 900;
+      letter-spacing: -0.5px; white-space: nowrap; text-decoration: none;
+      color: var(--text);
+    }
+    .logo .gs { color: var(--accent); }
+    .logo .dot { color: var(--muted); font-weight: 400; font-size: 1rem; }
+
+    /* Search */
+    .search-wrap {
+      flex: 1; min-width: 180px; max-width: 440px; position: relative;
+    }
+    .search-wrap input {
+      width: 100%; padding: 9px 42px 9px 15px;
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 999px; color: var(--text); font-size: .875rem;
+      outline: none; transition: border-color .2s, background .25s;
+    }
+    .search-wrap input:focus { border-color: var(--accent2); }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-btn {
+      position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+      background: var(--accent); border: none; border-radius: 999px;
+      width: 32px; height: 32px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; transition: background .15s;
+    }
+    .search-btn:hover { background: #c0303c; }
+
+    /* Header right controls */
+    .hdr-controls {
+      display: flex; align-items: center; gap: 10px; margin-left: auto;
+    }
+    .view-tabs {
+      display: flex; gap: 4px;
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 3px;
+    }
+    .view-tab {
+      text-decoration: none; font-size: .78rem; font-weight: 700;
+      padding: 5px 13px; border-radius: 999px; color: var(--muted);
+      transition: all .18s; white-space: nowrap;
+    }
+    .view-tab.active { background: var(--accent); color: #fff; }
+    .view-tab:not(.active):hover { color: var(--text); }
+
+    /* Theme toggle */
+    .theme-btn {
+      width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card2); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-size: 1.1rem;
+      transition: background .2s, border-color .2s; color: var(--text);
+      flex-shrink: 0;
+    }
+    .theme-btn:hover { border-color: var(--accent2); background: var(--card); }
+
+    /* result count badge */
+    .count-badge {
+      font-size: .72rem; color: var(--muted); white-space: nowrap;
+    }
+    .count-badge b { color: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       GENRE / FILTER BAR
+    ══════════════════════════════════════════ */
+    .filter-bar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 10px 24px; overflow-x: auto; scrollbar-width: none;
+      transition: background .25s, border-color .25s;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-inner {
+      display: flex; gap: 7px; min-width: max-content;
+    }
+    .fpill {
+      text-decoration: none; white-space: nowrap;
+      padding: 6px 15px; border-radius: 999px; font-size: .78rem; font-weight: 700;
+      border: 1px solid var(--border); color: var(--muted);
+      background: var(--card); transition: all .18s;
+    }
+    .fpill:hover { color: var(--text); border-color: var(--accent2); }
+    .fpill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* ══════════════════════════════════════════
+       PAGE BODY
+    ══════════════════════════════════════════ */
+    .page { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; }
+
+    .section-hdr {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+    }
+    .section-hdr h2 {
+      font-size: 1rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 1.4px; color: var(--muted);
+    }
+    .section-hdr h2 em { font-style: normal; color: var(--accent); }
+    .section-line {
+      flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ══════════════════════════════════════════
+       GRID
+    ══════════════════════════════════════════ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    /* ══════════════════════════════════════════
+       CARD
+    ══════════════════════════════════════════ */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: transform .22s ease, box-shadow .22s ease, background .25s, border-color .25s;
+      cursor: default;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 44px var(--shadow);
+      border-color: color-mix(in srgb, var(--accent2) 40%, var(--border));
+    }
+
+    /* poster */
+    .poster-wrap {
+      position: relative; aspect-ratio: 16/9;
+      background: var(--card2); overflow: hidden;
+    }
+    .poster-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; transition: transform .38s ease;
+    }
+    .card:hover .poster-wrap img { transform: scale(1.06); }
+    .no-poster {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem; color: var(--border);
+    }
+
+    /* play overlay */
+    .play-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.45);
+      opacity: 0; transition: opacity .22s; border: none; cursor: pointer;
+    }
+    .card:hover .play-overlay { opacity: 1; }
+    .play-btn {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 22px rgba(230,57,70,.65); transition: transform .15s;
+    }
+    .play-btn:hover { transform: scale(1.12); }
+    .play-btn svg { margin-left: 4px; }
+
+    /* rank badge */
+    .rank-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: var(--accent); color: #fff;
+      font-size: .7rem; font-weight: 900; padding: 3px 8px;
+      border-radius: 6px; letter-spacing: .5px;
+    }
+
+    /* card body */
+    .card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 9px; }
+    .card-title { font-size: .95rem; font-weight: 700; line-height: 1.35; color: var(--text); }
+
+    .meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rel-date {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .76rem; font-weight: 700; color: var(--accent2);
+    }
+    .rel-date svg { flex-shrink: 0; }
+
+    .mc-badge {
+      margin-left: auto; font-size: .72rem; font-weight: 900;
+      padding: 2px 7px; border-radius: 5px; color: #fff;
+    }
+    .mc-green  { background: #3a7d44; }
+    .mc-yellow { background: #a07800; }
+    .mc-red    { background: #8b1a1a; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      font-size: .68rem; padding: 2px 8px; border-radius: 4px;
+      background: var(--card2); border: 1px solid var(--border);
+      color: var(--muted); transition: background .25s, border-color .25s;
+    }
+
+    .platforms { font-size: .7rem; color: var(--muted); margin-top: auto; }
+
+    /* ══════════════════════════════════════════
+       SEARCH PANEL
+    ══════════════════════════════════════════ */
+    #searchPanel { display: none; }
+    #searchPanel.visible { display: block; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--muted); font-size: .82rem; font-weight: 600;
+      padding: 7px 16px; border-radius: 8px; cursor: pointer; margin-bottom: 28px;
+      transition: color .15s, border-color .15s, background .25s;
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--accent2); }
+
+    /* ══════════════════════════════════════════
+       LOADING SPINNER
+    ══════════════════════════════════════════ */
+    .spinner { display: none; text-align: center; padding: 60px 20px; }
+    .spinner.active { display: block; }
+    .spin-ring {
+      width: 42px; height: 42px; border: 3px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite; margin: 0 auto 12px;
+    }
+    .spinner p { color: var(--muted); font-size: .88rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════════════════
+       MODAL
+    ══════════════════════════════════════════ */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.88); z-index: 9999;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; width: min(880px, 100%);
+      overflow: hidden; position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,.7);
+      transition: background .25s, border-color .25s;
+    }
+    .modal-box video,
+    .modal-box iframe {
+      width: 100%; aspect-ratio: 16/9; display: block; border: none;
+    }
+    .modal-close-btn {
+      position: absolute; top: 10px; right: 12px; z-index: 10;
+      background: rgba(0,0,0,.7); border: none; color: #fff;
+      width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-game-title { padding: 13px 18px; font-weight: 700; font-size: .95rem; color: var(--text); }
+
+    /* trailer loading / fallback */
+    .trailer-loading {
+      aspect-ratio: 16/9; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      background: #0a0c12; color: var(--muted); font-size: .88rem;
+    }
+    .yt-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #ff0000; color: #fff; border: none;
+      padding: 10px 22px; border-radius: 8px; font-size: .88rem;
+      font-weight: 700; cursor: pointer; text-decoration: none;
+      transition: background .15s;
+    }
+    .yt-btn:hover { background: #c00; }
+
+    /* ══════════════════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════════════════ */
+    .empty {
+      text-align: center; padding: 70px 20px;
+      color: var(--muted); font-size: .95rem;
+    }
+    .empty span { display: block; font-size: 3rem; margin-bottom: 12px; }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      text-align: center; padding: 32px 24px;
+      color: var(--muted); font-size: .75rem;
+      border-top: 1px solid var(--border);
+      transition: border-color .25s;
+    }
+    footer a { color: var(--accent2); text-decoration: none; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .header-inner { gap: 10px; padding: 10px 16px; }
+      .logo { font-size: 1.2rem; }
+      .hdr-controls { gap: 7px; }
+      .view-tab { padding: 5px 10px; font-size: .72rem; }
+      .filter-bar { padding: 8px 16px; }
+      .page { padding: 20px 16px 50px; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+      .count-badge { display: none; }
+    }
+    @media (max-width: 480px) {
+      .search-wrap { order: 3; min-width: 100%; max-width: 100%; }
+      .header-inner { flex-wrap: wrap; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .card-body { padding: 10px 12px 12px; }
+      .card-title { font-size: .82rem; }
+    }
+    @media (max-width: 360px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ HEADER ════════════════════ -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">GAMES<span class="gs">_</span>SCRAPER<span class="dot"></span></a>
+
+    <div class="search-wrap">
+      <input id="searchInput" type="text"
+             placeholder="Search upcoming games…"
+             autocomplete="off" />
+      <button class="search-btn" onclick="runSearch()" title="Search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="hdr-controls">
+      <div class="view-tabs">
+        <a class="view-tab {% if active_view == 'upcoming' %}active{% endif %}"
+           href="/?view=upcoming&filter={{ active_filter }}">📅 Upcoming</a>
+        <a class="view-tab {% if active_view == 'awaited' %}active{% endif %}"
+           href="/?view=awaited">🔥 Top Awaited</a>
+      </div>
+
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+
+      <span class="count-badge"><b>{{ games|length }}</b> games</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════ FILTER BAR (only on upcoming view) ════════════════════ -->
+{% if active_view != 'awaited' %}
+<div class="filter-bar">
+  <div class="filter-inner">
+    {% for f in filters %}
+    <a href="/?view=upcoming&filter={{ f.id }}"
+       class="fpill {% if active_filter == f.id %}active{% endif %}">
+      {{ f.name }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════ SEARCH PANEL ════════════════════ -->
+<div id="searchPanel" class="page">
+  <button class="back-btn" onclick="closeSearch()">
+    ← Back
+  </button>
+
+  <div id="searchSpinner" class="spinner">
+    <div class="spin-ring"></div>
+    <p>Searching upcoming games…</p>
+  </div>
+
+  <div id="searchResultsWrap" style="display:none">
+    <div class="section-hdr">
+      <h2>Results for "<em id="searchQueryLabel"></em>"</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid" id="searchResultsGrid"></div>
+  </div>
+
+  <div id="similarWrap" style="display:none; margin-top:44px">
+    <div class="section-hdr">
+      <h2>Similar to <em id="similarLabel"></em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid" id="similarGrid"></div>
+  </div>
+</div>
+
+<!-- ════════════════════ MAIN PAGE ════════════════════ -->
+<div id="mainPage" class="page">
+  <div class="section-hdr">
+    {% if active_view == 'awaited' %}
+    <h2>🔥 Top 30 Most <em>Awaited</em> Games</h2>
+    {% else %}
+    <h2>
+      📅 Upcoming Releases
+      {% if active_filter %}— <em>{{ filters | selectattr('id','equalto',active_filter) | map(attribute='name') | first }}</em>{% endif %}
+    </h2>
+    {% endif %}
+    <div class="section-line"></div>
+  </div>
+
+  {% if games %}
+  <div class="grid">
+    {% for game in games %}
+    <div class="card">
+      <div class="poster-wrap">
+        {% if game.poster %}
+          <img src="{{ game.poster }}" alt="{{ game.name }}" loading="lazy" />
+        {% else %}
+          <div class="no-poster">🎮</div>
+        {% endif %}
+
+        {% if active_view == 'awaited' %}
+        <div class="rank-badge">#{{ loop.index }}</div>
+        {% endif %}
+
+        <button class="play-overlay"
+                data-id="{{ game.id }}"
+                data-name="{{ game.name | e }}"
+                onclick="openTrailer(this)">
+          <div class="play-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+          </div>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div class="card-title">{{ game.name }}</div>
+
+        <div class="meta-row">
+          <div class="rel-date">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            {{ game.release_date }}
+          </div>
+          {% if game.metacritic %}
+          <span class="mc-badge {% if game.metacritic >= 75 %}mc-green{% elif game.metacritic >= 50 %}mc-yellow{% else %}mc-red{% endif %}">
+            {{ game.metacritic }}
+          </span>
+          {% endif %}
+        </div>
+
+        {% if game.genres %}
+        <div class="tags">
+          {% for gn in game.genres[:3] %}
+          <span class="tag">{{ gn }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if game.platforms %}
+        <div class="platforms">{{ game.platforms | join(' · ') }}</div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <span>🎮</span>
+    No upcoming games found for this filter.<br>Try a different genre.
+  </div>
+  {% endif %}
+</div>
+
+<footer>
+  Powered by <a href="https://rawg.io/apidocs" target="_blank">RAWG Video Games Database</a>
+  &nbsp;·&nbsp; games_scraper
+</footer>
+
+<!-- ════════════════════ TRAILER MODAL ════════════════════ -->
+<div class="modal-bg" id="trailerModal" onclick="modalBgClick(event)">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeTrailer()">✕</button>
+    <div id="modalVideo"></div>
+    <div class="modal-game-title" id="modalTitle"></div>
+  </div>
+</div>
+
+<script>
+/* ── Theme ─────────────────────────────────────────── */
+(function(){
+  const saved = localStorage.getItem('gs_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved === 'dark' ? '🌙' : '☀️';
+})();
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('gs_theme', next);
+  document.getElementById('themeBtn').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+
+/* ── Trailer modal ──────────────────────────────────── */
+async function openTrailer(btn){
+  const id   = btn.dataset.id;
+  const name = btn.dataset.name;
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalVideo').innerHTML =
+    `<div class="trailer-loading"><div class="spin-ring"></div><p>Loading trailer…</p></div>`;
+  document.getElementById('trailerModal').classList.add('open');
+
+  const res  = await fetch(`/api/trailer/${id}?name=${encodeURIComponent(name)}`);
+  const data = await res.json();
+
+  if(data.type === 'direct'){
+    document.getElementById('modalVideo').innerHTML =
+      `<video controls autoplay src="${data.url}" style="background:#000"></video>`;
+  } else if(data.type === 'youtube'){
+    document.getElementById('modalVideo').innerHTML =
+      `<iframe src="https://www.youtube-nocookie.com/embed/${data.videoId}?autoplay=1&rel=0&modestbranding=1"
+               allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>`;
+  } else {
+    const q = encodeURIComponent(name + ' official trailer');
+    document.getElementById('modalVideo').innerHTML =
+      `<div class="trailer-loading">
+         <p>No trailer in database</p>
+         <a class="yt-btn" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+             <path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.1 2.7 12 2.7 12 2.7s-4.1 0-6.8.2c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.2v2c0 2.1.3 4.2.3 4.2s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.2 21.6 12 21.6 12 21.6s4.1 0 6.8-.3c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.2v-2C23.3 9.1 23 7 23 7zM9.7 15.5V8.4l8.1 3.6-8.1 3.5z"/>
+           </svg>
+           Search on YouTube
+         </a>
+       </div>`;
+  }
+}
+
+function closeTrailer(){
+  document.getElementById('trailerModal').classList.remove('open');
+  document.getElementById('modalVideo').innerHTML = '';
+}
+function modalBgClick(e){
+  if(e.target === document.getElementById('trailerModal')) closeTrailer();
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeTrailer(); });
+
+/* ── Search ─────────────────────────────────────────── */
+function esc(s){
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function cardHTML(g, rank){
+  const poster = g.poster
+    ? `<img src="${esc(g.poster)}" alt="${esc(g.name)}" loading="lazy"/>`
+    : `<div class="no-poster">🎮</div>`;
+  const rankBadge = rank ? `<div class="rank-badge">#${rank}</div>` : '';
+  const genres = (g.genres||[]).slice(0,3).map(gn=>`<span class="tag">${esc(gn)}</span>`).join('');
+  const mc = g.metacritic
+    ? `<span class="mc-badge ${g.metacritic>=75?'mc-green':g.metacritic>=50?'mc-yellow':'mc-red'}">${g.metacritic}</span>`
+    : '';
+  const plat = (g.platforms||[]).join(' · ');
+  return `
+  <div class="card">
+    <div class="poster-wrap">
+      ${poster}${rankBadge}
+      <button class="play-overlay" data-id="${g.id}" data-name="${esc(g.name)}" onclick="openTrailer(this)">
+        <div class="play-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${esc(g.name)}</div>
+      <div class="meta-row">
+        <div class="rel-date">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          ${esc(g.release_date)}
+        </div>${mc}
+      </div>
+      ${genres?`<div class="tags">${genres}</div>`:''}
+      ${plat?`<div class="platforms">${esc(plat)}</div>`:''}
+    </div>
+  </div>`;
+}
+
+async function runSearch(){
+  const q = document.getElementById('searchInput').value.trim();
+  if(!q) return;
+  document.getElementById('mainPage').style.display   = 'none';
+  document.getElementById('searchPanel').classList.add('visible');
+  document.getElementById('searchResultsWrap').style.display = 'none';
+  document.getElementById('similarWrap').style.display       = 'none';
+  document.getElementById('searchSpinner').classList.add('active');
+
+  const res  = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  document.getElementById('searchSpinner').classList.remove('active');
+  document.getElementById('searchQueryLabel').textContent = q;
+
+  const rGrid = document.getElementById('searchResultsGrid');
+  rGrid.innerHTML = data.results.length
+    ? data.results.map((g,i) => cardHTML(g, i+1)).join('')
+    : '<div class="empty"><span>🔍</span>No upcoming games found.<br>Try a different title.</div>';
+  document.getElementById('searchResultsWrap').style.display = 'block';
+
+  if(data.similar && data.similar.length){
+    document.getElementById('similarLabel').textContent = data.top_name || q;
+    document.getElementById('similarGrid').innerHTML = data.similar.map(g => cardHTML(g)).join('');
+    document.getElementById('similarWrap').style.display = 'block';
+  }
+}
+
+function closeSearch(){
+  document.getElementById('searchPanel').classList.remove('visible');
+  document.getElementById('mainPage').style.display = 'block';
+  document.getElementById('searchInput').value = '';
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') runSearch();
+});
+</script>
+</body>
+</html>
